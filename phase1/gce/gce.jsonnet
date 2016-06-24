@@ -34,7 +34,7 @@ function(cfg)
     std.manifestJson(
       tf.pki.kubeconfig_from_certs(
         user,
-        "root",
+        p1.instance_prefix + "root",
         "https://${google_compute_address.%(master_ip)s.address}" % names
       ));
   {
@@ -119,9 +119,9 @@ function(cfg)
           metadata: {
             "k8s-role": "master",
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
-            "k8s-ca-public-key": "${tls_self_signed_cert.root.cert_pem}",
-            "k8s-apisever-public-key": "${tls_locally_signed_cert.master.cert_pem}",
-            "k8s-apisever-private-key": "${tls_private_key.master.private_key_pem}",
+            "k8s-ca-public-key": "${tls_self_signed_cert.%sroot.cert_pem}" % p1.instance_prefix,
+            "k8s-apisever-public-key": "${tls_locally_signed_cert.%smaster.cert_pem}" % p1.instance_prefix,
+            "k8s-apisever-private-key": "${tls_private_key.%smaster.private_key_pem}" % p1.instance_prefix,
           },
           disk: [{
             image: gce.os_image,
@@ -140,7 +140,7 @@ function(cfg)
             "k8s-role": "node",
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
-            "k8s-node-kubeconfig": kubeconfig("node"),
+            "k8s-node-kubeconfig": kubeconfig(p1.instance_prefix + "node"),
           },
           disk: [{
             source_image: gce.os_image,
@@ -165,18 +165,18 @@ function(cfg)
 
       // Public Key Infrastructure
       tls_private_key: {
-        [name]: tf.pki.private_key
+        [p1.instance_prefix + name]: tf.pki.private_key
         for name in ["root", "node", "master", "admin"]
       },
       tls_self_signed_cert: {
-        root: tf.pki.tls_self_signed_cert("root"),
+        [p1.instance_prefix + "root"]: tf.pki.tls_self_signed_cert(p1.instance_prefix + "root"),
       },
       tls_cert_request: {
-        [name]: tf.pki.tls_cert_request(name)
+        [p1.instance_prefix +  name]: tf.pki.tls_cert_request(p1.instance_prefix + name)
         for name in ["node", "admin"]
       } {
-        master: tf.pki.tls_cert_request(
-          "master",
+        [p1.instance_prefix + "master"]: tf.pki.tls_cert_request(
+          p1.instance_prefix + "master",
           dns_names=[
             "kubernetes",
             "kubernetes.default",
@@ -194,14 +194,14 @@ function(cfg)
         ),
       },
       tls_locally_signed_cert: {
-        [name]: tf.pki.tls_locally_signed_cert(name, "root")
+        [p1.instance_prefix + name]: tf.pki.tls_locally_signed_cert(p1.instance_prefix + name, p1.instance_prefix + "root")
         for name in ["node", "master", "admin"]
       },
       null_resource: {
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > kubeconfig.json" % kubeconfig("admin"),
+              command: "echo '%s' > kubeconfig.json" % kubeconfig(p1.instance_prefix + "admin"),
             },
           }],
         },
