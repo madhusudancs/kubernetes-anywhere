@@ -27,6 +27,10 @@ default:
 	curl -sSL --fail -o "$@" "https://storage.googleapis.com/public-mikedanese-k8s/kconfig/$(CONF_TOOL_VERSION)/$(OS)/$(shell basename $@)"
 	chmod +x "$@"
 
+federation-config: .tmp/conf
+	CONFIG_="" .tmp/conf federation/Kconfig
+	federation/genconfig.sh
+
 config: .tmp/conf
 	CONFIG_="." .tmp/conf Kconfig
 

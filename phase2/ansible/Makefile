@@ -1,10 +1,10 @@
-TAG?=v2
-IMAGE?=gcr.io/mikedanese-k8s/install-k8s
+TAG=v2
+IMAGE=gcr.io/madhusudancs-k8s/install-k8s
 
 build:
 	docker build -t "$(IMAGE):$(TAG)" .
 
 push: build
-	docker push "$(IMAGE):$(TAG)"
+	gcloud docker push "$(IMAGE):$(TAG)"
 
 .PHONY: build push

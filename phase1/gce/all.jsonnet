@@ -1,6 +1,16 @@
-local base_cfg = import "../../.config.a.json";
+local clusterCfgs = import "../../.config.json";
 local tf_cluster = import "gce.jsonnet";
-{ "federation.tf": std.foldl(std.mergePatch, [
-  tf_cluster(base_cfg + cfg)
-  for cfg in base_cfg
-], {}) }
+{ 
+  "federation.tf": std.foldl(
+    std.mergePatch,
+    [
+      tf_cluster(cfg + {
+        phase1+: {
+          instance_prefix: cfg.name + "-" + cfg.phase1.instance_prefix
+        }
+      })
+      for cfg in clusterCfgs
+    ],
+    {}
+  )
+}

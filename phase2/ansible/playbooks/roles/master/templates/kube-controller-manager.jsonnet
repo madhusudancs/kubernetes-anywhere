@@ -30,7 +30,7 @@ function(cfg)
               "controller-manager",
               "--master=127.0.0.1:8080",
               "--cluster-name=" + cfg.phase1.cluster_name,
-              "--cluster-cidr=10.244.0.0/16",
+              "--cluster-cidr=" + cfg.phase1.cluster_cidr,
               "--allocate-node-cidrs=true",
               "--cloud-provider=%s" % cfg.phase1.cloud_provider,
               "--service-account-private-key-file=/srv/kubernetes/apiserver-key.pem",

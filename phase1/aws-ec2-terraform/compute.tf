@@ -127,3 +127,8 @@ resource "aws_ecr_repository" "kubernetes-master-pki-repository" {
 resource "aws_ecr_repository" "kubernetes-node-pki-repository" {
   name = "kubernetes-${var.cluster}/node/pki"
 }
+
+resource "aws_key_pair" "kubernetes-anywhere" {
+  key_name = "kubernetes-anywhere"
+  public_key = "${file(\"kubernetes-anywhere.pub\")}"
+}

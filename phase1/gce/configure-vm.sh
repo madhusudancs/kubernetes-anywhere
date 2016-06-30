@@ -22,19 +22,21 @@ EOF
 mkdir -p /etc/kubernetes/
 get_metadata "k8s-config" > /etc/kubernetes/k8s_config.json
 
-mkdir -p /srv/kubernetes
+export KUBE_HOME=/srv/kubernetes
+
+mkdir -p ${KUBE_HOME}
 case "${ROLE}" in
   "master")
     get_metadata "k8s-ca-public-key" \
-      > /srv/kubernetes/ca.pem
+      > ${KUBE_HOME}/ca.pem
     get_metadata "k8s-apisever-public-key" \
-      > /srv/kubernetes/apiserver.pem
+      > ${KUBE_HOME}/apiserver.pem
     get_metadata "k8s-apisever-private-key" \
-      > /srv/kubernetes/apiserver-key.pem
+      > ${KUBE_HOME}/apiserver-key.pem
     ;;
   "node")
     get_metadata "k8s-node-kubeconfig" \
-      > /srv/kubernetes/kubeconfig.json
+      > ${KUBE_HOME}/kubeconfig.json
     ;;
   "default")
     echo "'${ROLE}' is not a valid role"
@@ -45,9 +47,11 @@ curl -sSL https://get.docker.com/ | sh
 apt-get install bzip2
 systemctl start docker || true
 
+gcloud docker pull gcr.io/madhusudancs-k8s/install-k8s:v2
+
 docker run \
   --net=host \
   -v /:/host_root \
   -v /etc/kubernetes/k8s_config.json:/opt/playbooks/config.json:ro \
-  gcr.io/mikedanese-k8s/install-k8s:v2 \
+  gcr.io/madhusudancs-k8s/install-k8s:v2 \
   /opt/do_role.sh "${ROLE}"

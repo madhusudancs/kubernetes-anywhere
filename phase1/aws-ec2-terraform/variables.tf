@@ -37,9 +37,6 @@ variable "ec2_key_name" {
    default     = "kubernetes-anywhere"
 }
 
-variable "aws_access_key" {}
-variable "aws_secret_key" {}
-
 variable "aws_region" {
    description = "The EC2 region where to deploy Kubernetes cluster"
    default     = "us-east-1"
