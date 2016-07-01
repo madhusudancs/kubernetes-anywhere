@@ -1,4 +1,4 @@
-local clusterCfgs = import "../../.config.json";
+local clusterCfgs = import "../../federation/config.json";
 local tf_cluster = import "gce.jsonnet";
 { 
   "federation.tf": std.foldl(

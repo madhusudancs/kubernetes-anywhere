@@ -34,7 +34,7 @@ function(cfg)
     std.manifestJson(
       tf.pki.kubeconfig_from_certs(
         user,
-        p1.instance_prefix + "root",
+        p1.cluster_name + "-root",
         "https://${google_compute_address.%(master_ip)s.address}" % names
       ));
   {
@@ -119,9 +119,9 @@ function(cfg)
           metadata: {
             "k8s-role": "master",
             "k8s-config": config_metadata_template % [names.master_ip, "master"],
-            "k8s-ca-public-key": "${tls_self_signed_cert.%sroot.cert_pem}" % p1.instance_prefix,
-            "k8s-apisever-public-key": "${tls_locally_signed_cert.%smaster.cert_pem}" % p1.instance_prefix,
-            "k8s-apisever-private-key": "${tls_private_key.%smaster.private_key_pem}" % p1.instance_prefix,
+            "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,
+            "k8s-apisever-public-key": "${tls_locally_signed_cert.%s-master.cert_pem}" % p1.cluster_name,
+            "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
           },
           disk: [{
             image: gce.os_image,
@@ -134,13 +134,13 @@ function(cfg)
       google_compute_instance_template: {
         [names.instance_template]: instance_defaults {
           name: names.instance_template,
-          tags: ["%(cluster_name)s-node" % p1],
+          tags: ["%(cluster_name)s-minion" % p1],
           metadata: {
             "startup-script": std.escapeStringDollars(importstr "configure-vm.sh"),
             "k8s-role": "node",
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
-            "k8s-node-kubeconfig": kubeconfig(p1.instance_prefix + "node"),
+            "k8s-node-kubeconfig": kubeconfig(p1.cluster_name + "-node"),
           },
           disk: [{
             source_image: gce.os_image,
@@ -165,18 +165,18 @@ function(cfg)
 
       // Public Key Infrastructure
       tls_private_key: {
-        [p1.instance_prefix + name]: tf.pki.private_key
+        [p1.cluster_name + "-" + name]: tf.pki.private_key
         for name in ["root", "node", "master", "admin"]
       },
       tls_self_signed_cert: {
-        [p1.instance_prefix + "root"]: tf.pki.tls_self_signed_cert(p1.instance_prefix + "root"),
+        [p1.cluster_name + "-root"]: tf.pki.tls_self_signed_cert(p1.cluster_name + "-root"),
       },
       tls_cert_request: {
-        [p1.instance_prefix +  name]: tf.pki.tls_cert_request(p1.instance_prefix + name)
+        [p1.cluster_name + "-" + name]: tf.pki.tls_cert_request(p1.cluster_name + "-" + name)
         for name in ["node", "admin"]
       } {
-        [p1.instance_prefix + "master"]: tf.pki.tls_cert_request(
-          p1.instance_prefix + "master",
+        [p1.cluster_name + "-master"]: tf.pki.tls_cert_request(
+          p1.cluster_name + "-master",
           dns_names=[
             "kubernetes",
             "kubernetes.default",
@@ -194,14 +194,14 @@ function(cfg)
         ),
       },
       tls_locally_signed_cert: {
-        [p1.instance_prefix + name]: tf.pki.tls_locally_signed_cert(p1.instance_prefix + name, p1.instance_prefix + "root")
+        [p1.cluster_name + "-" + name]: tf.pki.tls_locally_signed_cert(p1.cluster_name + "-" + name, p1.cluster_name + "-root")
         for name in ["node", "master", "admin"]
       },
       null_resource: {
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > kubeconfig.json" % kubeconfig(p1.instance_prefix + "admin"),
+              command: "echo '%s' > kubeconfig.json" % kubeconfig(p1.cluster_name + "-admin"),
             },
           }],
         },
