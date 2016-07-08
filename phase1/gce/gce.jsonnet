@@ -31,12 +31,11 @@ function(cfg)
     },
   });
   local kubeconfig(user) =
-    std.manifestJson(
-      tf.pki.kubeconfig_from_certs(
-        user,
-        p1.cluster_name + "-root",
-        "https://${google_compute_address.%(master_ip)s.address}" % names
-      ));
+    tf.pki.kubeconfig_from_certs(
+      user,
+      p1.cluster_name + "-root",
+      "https://${google_compute_address.%(master_ip)s.address}" % names
+    );
   {
     output: {
       [names.master_ip]: {
@@ -140,7 +139,7 @@ function(cfg)
             "k8s-role": "node",
             "k8s-deploy-bucket": names.release_bucket,
             "k8s-config": config_metadata_template % [names.master_ip, "node"],
-            "k8s-node-kubeconfig": kubeconfig(p1.cluster_name + "-node"),
+            "k8s-node-kubeconfig": std.manifestJson(kubeconfig(p1.cluster_name + "-node")),
           },
           disk: [{
             source_image: gce.os_image,
@@ -198,7 +197,7 @@ function(cfg)
         for name in ["node", "master", "admin"]
       },
       null_resource: {
-        kubeconfig: {
+        [p1.cluster_name + "-kubeconfig"]: {
           provisioner: [{
             "local-exec": {
               local cfg = kubeconfig(p1.cluster_name + "-admin"),
@@ -225,5 +224,12 @@ function(cfg)
           }],
         },
       },
+      kubernetes_kubeconfig: {
+        [p1.cluster_name]: {
+          server: "${google_compute_address.%(master_ip)s.address}" % names,
+          configdata: std.manifestJson(kubeconfig(p1.cluster_name + "-admin"))
+        }
+      },
     },
   }
+  
