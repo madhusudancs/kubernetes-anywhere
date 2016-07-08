@@ -1,9 +1,8 @@
 [
   {
-    "name": "cluster1",
     "phase1": {
       "num_nodes": 4,
-      "instance_prefix": "kubernetes",
+      "cluster_name": "cluster1-kubernetes",
       "cloud_provider": "gce",
       "cluster_cidr": "10.180.0.0/14",
       "gce": {
@@ -11,7 +10,7 @@
         "instance_type": "n1-standard-2",
         "project": "madhusudancs-k8s",
         "region": "us-central1",
-        "zone": "us-central1-b",
+        "zone": "us-central1-a",
         "network": "anywhereworks"
       }
     },
@@ -28,10 +27,9 @@
     }
   },
   {
-    "name": "cluster2",
     "phase1": {
       "num_nodes": 4,
-      "instance_prefix": "kubernetes",
+      "cluster_name": "cluster2-kubernetes",
       "cloud_provider": "gce",
       "cluster_cidr": "10.184.0.0/14",
       "gce": {
@@ -56,10 +54,9 @@
     }
   },
   {
-    "name": "cluster3",
     "phase1": {
       "num_nodes": 4,
-      "instance_prefix": "kubernetes",
+      "cluster_name": "cluster3-kubernetes",
       "cloud_provider": "gce",
       "cluster_cidr": "10.188.0.0/14",
       "gce": {
@@ -67,7 +64,7 @@
         "instance_type": "n1-standard-2",
         "project": "madhusudancs-k8s",
         "region": "us-central1",
-        "zone": "us-central1-b",
+        "zone": "us-central1-f",
         "network": "anywhereworks"
       }
     },

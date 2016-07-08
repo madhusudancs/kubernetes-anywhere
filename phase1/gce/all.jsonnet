@@ -3,13 +3,9 @@ local util = import "../../util/arrayMerge.jsonnet";
 local tfCluster = import "gce.jsonnet";
 { 
   "federation.tf": std.foldl(
-    util.mergeConcatArr,
+    std.mergePatch,
     [
-      tfCluster(cfg + {
-        phase1+: {
-          instance_prefix: cfg.name + "-" + cfg.phase1.instance_prefix
-        }
-      })
+      tfCluster(cfg)
       for cfg in clusterCfgs
     ],
     {}
