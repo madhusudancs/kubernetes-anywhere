@@ -201,8 +201,27 @@ function(cfg)
         kubeconfig: {
           provisioner: [{
             "local-exec": {
-              command: "echo '%s' > kubeconfig.json" % kubeconfig(p1.cluster_name + "-admin"),
-            },
+              local cfg = kubeconfig(p1.cluster_name + "-admin"),
+              local cluster = cfg.clusters[0],
+              local user = cfg.users[0],
+              local context = cfg.contexts[0],
+              local tmp_cmd = "TMPDIR=$(mktemp -d -t %(cluster_name)s.XXXXXX); echo %(ca)s > $${TMPDIR}/ca.crt; echo %(cc)s > $${TMPDIR}/cc.crt; echo %(ck)s > $${TMPDIR}/ck.key" % {
+                  cluster_name: cluster.name,
+                  ca: cluster.cluster["certificate-authority-data"],
+                  cc: user.user["client-certificate-data"],
+                  ck: user.user["client-key-data"]
+              },
+              command: "%(tmp_cmd)s;
+              kubectl config set-cluster %(cluster_name)s --server=%(server)s --certificate-authority=$${TMPDIR}/ca.crt --embed-certs=true;
+              kubectl config set-credentials %(user_name)s --client-certificate=$${TMPDIR}/cc.crt --client-key=$${TMPDIR}/ck.key --embed-certs=true;
+              kubectl config set-context %(context_name)s --cluster=%(cluster_name)s --user=%(user_name)s" % {
+                  tmp_cmd: tmp_cmd,
+                  cluster_name: cluster.name,
+                  user_name: user.name,
+                  context_name: context.name,
+                  server: cluster.cluster.server,
+              }
+            }
           }],
         },
       },
