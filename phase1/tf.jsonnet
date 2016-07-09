@@ -41,18 +41,18 @@
         "client_auth",
       ],
     },
-    kubeconfig_from_certs(name, signer, apiserver_url): {
+    kubeconfig_from_certs(user, cluster, context, signer, apiserver_url): {
       apiVersion: "v1",
       kind: "Config",
       users: [{
-        name: name,
+        name: user,
         user: {
-          "client-key-data": "${base64encode(tls_private_key.%s.private_key_pem)}" % name,
-          "client-certificate-data": "${base64encode(tls_locally_signed_cert.%s.cert_pem)}" % name,
+          "client-key-data": "${base64encode(tls_private_key.%s.private_key_pem)}" % user,
+          "client-certificate-data": "${base64encode(tls_locally_signed_cert.%s.cert_pem)}" % user,
         },
       }],
       clusters: [{
-        name: "local",
+        name: cluster,
         cluster: {
           "certificate-authority-data": "${base64encode(tls_self_signed_cert.%s.cert_pem)}" % signer,
           server: apiserver_url,
@@ -60,12 +60,12 @@
       }],
       contexts: [{
         context: {
-          cluster: "local",
-          user: name,
+          cluster: cluster,
+          user: user,
         },
-        name: "service-account-context",
+        name: context,
       }],
-      "current-context": "service-account-context",
+      "current-context": context,
     },
   },
 }

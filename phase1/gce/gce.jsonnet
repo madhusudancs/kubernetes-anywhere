@@ -45,7 +45,7 @@ function(cfg)
     },
     provider: {
       google: {
-        credentials: "${file(\"account.json\")}",
+        credentials: if std.objectHas(p1, "credentials") then "${file(\"%(credentials)s\")}" % p1 else "",
         project: gce.project,
         region: gce.region,
       },
@@ -197,40 +197,15 @@ function(cfg)
         [p1.cluster_name + "-" + name]: tf.pki.tls_locally_signed_cert(p1.cluster_name + "-" + name, p1.cluster_name + "-root")
         for name in ["node", "master", "admin"]
       },
-      null_resource: {
-        [p1.cluster_name + "-kubeconfig"]: {
-          provisioner: [{
-            "local-exec": {
-              local cfg = kubeconfig(p1.cluster_name + "-admin"),
-              local cluster = cfg.clusters[0],
-              local user = cfg.users[0],
-              local context = cfg.contexts[0],
-              local tmp_cmd = "TMPDIR=$(mktemp -d -t %(cluster_name)s.XXXXXX); echo %(ca)s > $${TMPDIR}/ca.crt; echo %(cc)s > $${TMPDIR}/cc.crt; echo %(ck)s > $${TMPDIR}/ck.key" % {
-                  cluster_name: cluster.name,
-                  ca: cluster.cluster["certificate-authority-data"],
-                  cc: user.user["client-certificate-data"],
-                  ck: user.user["client-key-data"]
-              },
-              command: "%(tmp_cmd)s;
-              kubectl config set-cluster %(cluster_name)s --server=%(server)s --certificate-authority=$${TMPDIR}/ca.crt --embed-certs=true;
-              kubectl config set-credentials %(user_name)s --client-certificate=$${TMPDIR}/cc.crt --client-key=$${TMPDIR}/ck.key --embed-certs=true;
-              kubectl config set-context %(context_name)s --cluster=%(cluster_name)s --user=%(user_name)s" % {
-                  tmp_cmd: tmp_cmd,
-                  cluster_name: cluster.name,
-                  user_name: user.name,
-                  context_name: context.name,
-                  server: cluster.cluster.server,
-              }
-            }
-          }],
-        },
-      },
       kubernetes_kubeconfig: {
         [p1.cluster_name]: {
-          server: "${google_compute_address.%(master_ip)s.address}" % names,
-          configdata: std.manifestJson(kubeconfig(p1.cluster_name + "-admin"))
+          depends_on: [
+            "google_compute_firewall.%(master_firewall_rule)s" % names,
+            "google_compute_instance.%(master_instance)s" % names,
+          ],
+          server: "https://${google_compute_address.%(master_ip)s.address}" % names,
+          configdata: kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name)
         }
       },
     },
   }
-  
