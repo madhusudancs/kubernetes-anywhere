@@ -1,8 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: federation-apiserver
-  namespace: federation
+  name: {{.apiserver.name}}
+  namespace: {{.namespace}}
   labels:
     app: federated-cluster
 spec:
@@ -15,14 +15,14 @@ spec:
     spec:
       containers:
       - name: apiserver
-        image: gcr.io/madhusudancs-k8s/federation-apiserver:v1.4.0-alpha.0.892_cd9deccbbf9b08-dirty
+        image: {{.apiserver.image}}:{{.apiserver.imageTag}}
         command:
         - /usr/local/bin/federation-apiserver
         - --bind-address=0.0.0.0
         - --etcd-servers=http://localhost:2379
-        - --service-cluster-ip-range=10.0.0.0/8
+        - --service-cluster-ip-range={{.apiserver.serviceCIDR}}
         - --secure-port=443
-        - --advertise-address={{.FEDERATION_API_HOST}}
+        - --advertise-address={{.apiserver.host}}
         # TODO: --admission-control values must be set when support is added for each type of control.
         - --token-auth-file=/srv/kubernetes/known-tokens.csv
         ports:
@@ -49,4 +49,4 @@ spec:
           secretName: federation-apiserver-secrets
       - name: varetcd
         persistentVolumeClaim:
-          claimName: federation-apiserver-etcd-claim
+          claimName: {{.apiserver.name}}-etcd-claim

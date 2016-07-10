@@ -1,0 +1,13 @@
+name: federation
+version: 1.4.0
+description: A Helm chart for Kubernetes Cluster Federation
+keywords:
+  - cluster
+  - containers
+  - federation
+home: http://kubernetes.io
+sources:
+  - https://github.com/kubernetes/kubernetes
+maintainers:
+  - name: Madhusudan C.S.
+    email: madhusudancs@google.com

@@ -1,8 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: federation-controller-manager
-  namespace: federation
+  name: {{.controllerManager.name}}
+  namespace: {{.namespace}}
   labels:
     app: federated-cluster
 spec:
@@ -23,14 +23,14 @@ spec:
         - name: ssl-certs
           readOnly: true
           mountPath: /etc/ssl/certs
-        image: gcr.io/madhusudancs-k8s/federation-controller-manager:v1.4.0-alpha.0.892_cd9deccbbf9b08-dirty
+        image: {{.controllerManager.image}}:{{.controllerManager.imageTag}}
         command:
         - /usr/local/bin/federation-controller-manager
-        - --master=https://federation-apiserver:443
-        - --dns-provider=google-clouddns
-        - --dns-provider-config=
-        - --federation-name=myfederation
-        - --zone-name=ubernetes-test.com
+        - --master=https://{{.apiserver.name}}
+        - --dns-provider={{.dnsProvider}}
+        - --dns-provider-config={{.dnsProviderConfig}}
+        - --federation-name={{.federationName}}
+        - --zone-name={{.dnsZone}}
         ports:
         - containerPort: 443
           name: https
