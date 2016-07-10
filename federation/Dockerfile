@@ -30,3 +30,9 @@ ADD terraform-provider-kubernetes /bin/
 # RUN /jsonnet/jsonnet -J ../.. --multi .tmp all.jsonnet
 
 ENTRYPOINT ["/bin/bash"]
+
+# To build
+# docker build -t jsonnet:0.1 .
+
+# To run
+# docker run -it -m 12G --memory-swap=16G -v ~/godev/src/k8s.io/kubernetes-anywhere:/kubernetes-anywhere -v $HOME/.config/gcloud/application_default_credentials.json:/root/.config/gcloud/application_default_credentials.json jsonnet:0.1

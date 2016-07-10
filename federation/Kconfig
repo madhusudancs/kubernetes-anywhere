@@ -1,9 +1,0 @@
-menu "Federation configuration"
-
-config federation.num_clusters
-	int "Number of clusters in the federation"
-	default "1"
-	help
-	  Number of clusters you want in your federation.
-
-endmenu
