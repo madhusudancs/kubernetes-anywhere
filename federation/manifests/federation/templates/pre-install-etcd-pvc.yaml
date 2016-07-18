@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{.apiserver.name}}-etcd-claim
+  name: {{.Values.apiserverName}}-etcd-claim
   annotations:
     volume.alpha.kubernetes.io/storage-class: "yes"
-  namespace: {{.namespace}}
+    "helm.sh/hook": pre-install
+  namespace: {{.Values.namespace.name}}
   labels:
     app: federated-cluster
 spec:

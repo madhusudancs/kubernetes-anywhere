@@ -1,37 +1,76 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{.apiserver.name}}
-  namespace: {{.namespace}}
+  name: {{.Values.apiserverName}}
+  namespace: {{.Values.namespace.name}}
   labels:
     app: federated-cluster
 spec:
   template:
     metadata:
-      name: federation-apiserver
+      name: {{.Values.apiserverName}}
       labels:
         app: federated-cluster
         module: federation-apiserver
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+        # TODO: imagePullPolicy = Always is only for debugging. It should be defaulted (to Never) when shipped.
+        pod.alpha.kubernetes.io/init-containers: '[
+            {
+                "imagePullPolicy": "Always",
+                "name": "init",
+                "image": "{{.Values.apiserverFetchSvcAddressImage}}:{{.Values.apiserverFetchSvcAddressVersion}}",
+                "env": [
+                  {
+                    "name": "API_SERVER_SVC_NAMESPACE",
+                    "value": "{{.Values.namespace.name}}"
+                  },
+                  {
+                    "name": "API_SERVER_SVC_NAME",
+                    "value": "{{.Values.apiserverName}}"
+                  },
+                  {
+                    "name": "API_SERVER_ENDPOING_CONFIGMAP_NAME",
+                    "value": "{{.Values.apiserverName}}-endpoint"
+                  },
+                  {
+                    "name": "API_SERVER_TOKENS_SECRET_NAME",
+                    "value": "{{.Values.apiserverName}}-tokens"
+                  },
+                  {
+                    "name": "API_SERVER_KUBECONFIG_SECRET_NAME",
+                    "value": "{{.Values.apiserverName}}-kubeconfig"
+                  }
+                ]
+            }
+        ]'
     spec:
       containers:
       - name: apiserver
-        image: {{.apiserver.image}}:{{.apiserver.imageTag}}
+        image: {{.Values.apiserverImage}}:{{.Values.apiserverVersion}}
         command:
-        - /usr/local/bin/federation-apiserver
+        - /hyperkube
+        - federation-apiserver
         - --bind-address=0.0.0.0
         - --etcd-servers=http://localhost:2379
-        - --service-cluster-ip-range={{.apiserver.serviceCIDR}}
+        - --service-cluster-ip-range={{.Values.apiserverServiceCIDR}}
         - --secure-port=443
-        - --advertise-address={{.apiserver.host}}
+        - --advertise-address=$(API_SERVER_SVC_ENDPOINT)
         # TODO: --admission-control values must be set when support is added for each type of control.
-        - --token-auth-file=/srv/kubernetes/known-tokens.csv
+        - --token-auth-file=/srv/kubernetes/knowntokens.csv
         ports:
         - containerPort: 443
           name: https
         - containerPort: 8080
           name: local
+        env:
+        - name: API_SERVER_SVC_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: {{.Values.apiserverName}}-endpoint
+              key: endpoint
         volumeMounts:
-        - name: federation-apiserver-secrets
+        - name: {{.Values.apiserverName}}-tokens
           mountPath: /srv/kubernetes/
           readOnly: true
       - name: etcd
@@ -44,9 +83,9 @@ spec:
         - mountPath: /var/etcd
           name: varetcd
       volumes:
-      - name: federation-apiserver-secrets
+      - name: {{.Values.apiserverName}}-tokens
         secret:
-          secretName: federation-apiserver-secrets
+          secretName: {{.Values.apiserverName}}-tokens
       - name: varetcd
         persistentVolumeClaim:
-          claimName: {{.apiserver.name}}-etcd-claim
+          claimName: {{.Values.apiserverName}}-etcd-claim

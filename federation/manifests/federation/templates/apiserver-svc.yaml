@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.apiserver.name}}
-  namespace: {{.namespace}}
+  name: {{.Values.apiserverName}}
+  namespace: {{.Values.namespace.name}}
   labels:
     app: federated-cluster
 spec:

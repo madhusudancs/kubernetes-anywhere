@@ -2,3 +2,20 @@
 # This is a YAML-formatted file.
 # Declare name/value pairs to be passed into your templates.
 # name: value
+
+namespace:
+  name: "federation"
+
+apiserverName: "federation-apiserver"
+apiserverImage: "gcr.io/google-containers/hyperkube-amd64"
+apiserverVersion: "v1.3.0"
+apiserverServiceCIDR: "10.0.0.0/16"
+apiserverFetchSvcAddressImage: "gcr.io/madhusudancs-k8s/fetch-svc-endpoint"
+apiserverFetchSvcAddressVersion: "v1.3.0"
+
+controllerManagerName: "federation-controller-manager"
+controllerManagerImage: "gcr.io/google-containers/hyperkube-amd64"
+controllerManagerVersion: "v1.3.0"
+controllerManagerDNSProvider: "google-clouddns"
+controllerManagerFederationName: "federation"
+controllerManagerDNSZone: "federation.example"

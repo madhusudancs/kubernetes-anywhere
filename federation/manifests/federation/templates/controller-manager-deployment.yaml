@@ -1,8 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{.controllerManager.name}}
-  namespace: {{.namespace}}
+  name: {{.Values.controllerManagerName}}
+  namespace: {{.Values.namespace.name}}
   labels:
     app: federated-cluster
 spec:
@@ -23,14 +23,15 @@ spec:
         - name: ssl-certs
           readOnly: true
           mountPath: /etc/ssl/certs
-        image: {{.controllerManager.image}}:{{.controllerManager.imageTag}}
+        image: {{.Values.controllerManagerImage}}:{{.Values.controllerManagerVersion}}
         command:
-        - /usr/local/bin/federation-controller-manager
-        - --master=https://{{.apiserver.name}}
-        - --dns-provider={{.dnsProvider}}
-        - --dns-provider-config={{.dnsProviderConfig}}
-        - --federation-name={{.federationName}}
-        - --zone-name={{.dnsZone}}
+        - /hyperkube
+        - federation-controller-manager
+        - --master=https://{{.Values.apiserverName}}
+        - --dns-provider={{.Values.controllerManagerDNSProvider}}
+        - --dns-provider-config={{.Values.controllerManagerDNSProviderConfig}}
+        - --federation-name={{.Values.controllerManagerFederationName}}
+        - --zone-name={{.Values.controllerManagerDNSZone}}
         ports:
         - containerPort: 443
           name: https

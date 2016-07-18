@@ -1,0 +1,14 @@
+name: namespace
+version: 1.4.0
+description: A Helm chart for creating a namespace for Kubernetes Cluster Federation
+keywords:
+  - cluster
+  - containers
+  - federation
+  - namespace
+home: http://kubernetes.io
+sources:
+  - https://github.com/kubernetes/kubernetes
+maintainers:
+  - name: Madhusudan C.S.
+    email: madhusudancs@google.com
