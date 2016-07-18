@@ -207,5 +207,15 @@ function(cfg)
           configdata: kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name)
         }
       },
+      kubernetes_cluster: {
+        [p1.cluster_name]: {
+          depends_on: [
+            "google_compute_firewall.%(master_firewall_rule)s" % names,
+            "google_compute_instance.%(master_instance)s" % names,
+          ],
+          server: "https://${google_compute_address.%(master_ip)s.address}" % names,
+          configdata: kubeconfig(p1.cluster_name + "-admin", p1.cluster_name, p1.cluster_name)
+        }
+      },
     },
   }
