@@ -1,5 +1,21 @@
+# Copyright 2016 The Kubernetes Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 FROM ubuntu:16.04
 MAINTAINER "Madhusudan C.S. <madhusudancs@google.com>"
+
+ARG VERSION
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
@@ -25,19 +41,19 @@ ENV PATH ${GOBIN}:${GOROOT}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bi
 RUN mkdir -p ${GOBIN}
 RUN curl https://glide.sh/get | sh
 
+ADD https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubectl /bin/kubectl 
+RUN chmod +x /bin/kubectl
+
 RUN mkdir -p $(dirname ${HELMSRC})
 RUN git clone https://github.com/kubernetes/helm.git ${HELMSRC}
 RUN cd ${HELMSRC} && make bootstrap build 
-RUN cd ${HELMSRC} && cp bin/{helm,tiller} ${GOBIN}
+RUN cd ${HELMSRC} && cp bin/helm ${GOBIN}
+RUN cd ${HELMSRC} && cp bin/tiller ${GOBIN}
 RUN helm init -c
 
-# RUN curl https://storage.googleapis.com/kubernetes-release/release/v1.3.0/bin/linux/amd64/kubectl -o /bin/kubectl 
-# RUN chmod +x /bin/kubectl
+ADD helminstall.sh /
 
-ENTRYPOINT ["/bin/bash"]
+ADD /namespace /namespace
+ADD /federation /federation
 
-# To build
-# docker build -t helm:0.1 .
-
-# To run
-# docker run -it -m 12G --memory-swap=16G -v ~/godev/src/k8s.io/kubernetes-anywhere/federation/manifests:/manifests helm:0.1
+ENTRYPOINT ["/helminstall.sh"]
