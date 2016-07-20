@@ -14,12 +14,21 @@
 
 IMAGE_NAME?=gcr.io/madhusudancs-k8s/kubernetes-anywhere-federation
 IMAGE_VERSION?=v0.0.1
+
+KUBE_VERSION?=v1.3.0
+
 UID?=$(shell id -u)
 GID?=$(shell id -g)
+TEMP_DIR:=$(shell mktemp -d)
 
 .PHONY: build
 build:
-	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) .
+	tar czf $(TEMP_DIR)/kubernetes-anywhere.tar.gz ../federation ../phase{1,2,3}
+	cp Dockerfile $(TEMP_DIR)/
+	cd $(TEMP_DIR) && docker build \
+	  --build-arg VERSION=$(KUBE_VERSION) \
+	  -t $(IMAGE_NAME):$(IMAGE_VERSION) .
+	rm -rf $(TEMP_DIR)
 
 .PHONY: push
 push:
@@ -28,11 +37,22 @@ push:
 .PHONY: run
 run:
 	docker run \
-	  -it \
+	  --user=$(id -u):$(id -g) \
+	  -m 12G \
+	  -v ${HOME}/.config/gcloud/application_default_credentials.json:/root/.config/gcloud/application_default_credentials.json:ro \
+	  -v ${HOME}/.kube:/root/.kube \
+	  -v ${PWD}/.gen:/_output \
+	  $(IMAGE_NAME):$(IMAGE_VERSION) \
+	  ${do}
+
+.PHONY: runbash
+runbash:
+	docker run \
 	  --user=$(UID):$(GID) \
 	  -m 12G \
-	  --memory-swap=16G \
-	  -v $(HOME)/godev/src/k8s.io/kubernetes-anywhere:/kubernetes-anywhere \
-	  -v $(HOME)/.config/gcloud/application_default_credentials.json:/.config/gcloud/application_default_credentials.json \
-	  -v $(HOME)/.kube:/.kube \
+	  -v ${HOME}/.config/gcloud/application_default_credentials.json:/.config/gcloud/application_default_credentials.json \
+	  -v ${HOME}/.kube:/.kube \
+	  -v ${PWD}/.gen:/_output \
+	  -it \
+	  --entrypoint "/bin/bash" \
 	  $(IMAGE_NAME):$(IMAGE_VERSION)

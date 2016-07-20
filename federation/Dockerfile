@@ -15,18 +15,26 @@
 FROM ubuntu:16.04
 MAINTAINER "Madhusudan C.S. <madhusudancs@google.com>"
 
+ARG VERSION
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
+        jq \
 		g++ \
 		gcc \
 		libc6-dev \
 		make \
+		curl \
 		ca-certificates \
 		unzip \
 	&& rm -rf /var/lib/apt/lists/*
 
+
+ADD https://storage.googleapis.com/kubernetes-release/release/${VERSION}/bin/linux/amd64/kubectl /bin/kubectl
+RUN chmod +x /bin/kubectl
+
 RUN git clone https://github.com/google/jsonnet.git /jsonnet
-RUN cd /jsonnet && make
+RUN cd /jsonnet && make && cp jsonnet /usr/local/bin/
 
 ENV TERRAFORM_VERSION=0.7.0-rc1
 
@@ -38,10 +46,32 @@ RUN sha256sum --status -c terraform_${TERRAFORM_VERSION}_SHA256SUMS
 RUN unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip -d /usr/local/bin
 RUN rm -f terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
-ADD terraform-provider-kubernetes /usr/local/bin/
-RUN chmod +x /usr/local/bin/terraform-provider-kubernetes
+ADD https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz ./
+RUN tar xzf go1.6.2.linux-amd64.tar.gz
 
-# WORKDIR cd /kubernetes-anywhere/phase1/gce
-# RUN /jsonnet/jsonnet -J ../.. --multi .tmp all.jsonnet
+ENV GOROOT /go
+ENV GOPATH /godev
+ENV GOBIN ${GOPATH}/bin
 
-ENTRYPOINT ["/bin/bash"]
+ENV PATH ${GOBIN}:${GOROOT}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN mkdir -p ${GOBIN}
+RUN curl https://glide.sh/get | sh
+
+RUN mkdir -p ${GOPATH}/src/k8s.io
+ENV KUBEFORM_DIR ${GOPATH}/src/k8s.io/contrib/kubeform
+
+RUN git clone https://github.com/madhusudancs/contrib.git ${GOPATH}/src/k8s.io/contrib -b kubeform-kubeconfig-delete
+RUN cd ${KUBEFORM_DIR} && glide install && make
+RUN cd ${KUBEFORM_DIR} && cp terraform-provider-kubernetes /usr/local/bin/
+
+# Docker is weird. If I add the directory without creating a tarball and
+# change the permissions, I can't access anything within the subdirectories
+# in /kubernetes-anywhere when I run the container with --user
+# (non-privileged user). But I can when I extract the tarball.
+ADD kubernetes-anywhere.tar.gz /kubernetes-anywhere
+RUN chmod a+rwx /kubernetes-anywhere
+
+WORKDIR /kubernetes-anywhere/federation
+
+ENTRYPOINT ["./entrypoint.sh"]
