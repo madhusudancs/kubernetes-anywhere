@@ -122,6 +122,7 @@ function(cfg)
             "k8s-ca-public-key": "${tls_self_signed_cert.%s-root.cert_pem}" % p1.cluster_name,
             "k8s-apisever-public-key": "${tls_locally_signed_cert.%s-master.cert_pem}" % p1.cluster_name,
             "k8s-apisever-private-key": "${tls_private_key.%s-master.private_key_pem}" % p1.cluster_name,
+            "k8s-master-kubeconfig": kubeconfig(p1.cluster_name + "-master", "local", "service-account-context"),
           },
           disk: [{
             image: gce.os_image,

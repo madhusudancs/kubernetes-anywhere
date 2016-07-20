@@ -33,6 +33,8 @@ case "${ROLE}" in
       > ${KUBE_HOME}/apiserver.pem
     get_metadata "k8s-apisever-private-key" \
       > ${KUBE_HOME}/apiserver-key.pem
+    get_metadata "k8s-master-kubeconfig" \
+      > ${KUBE_HOME}/kubeconfig.json
     ;;
   "node")
     get_metadata "k8s-node-kubeconfig" \
