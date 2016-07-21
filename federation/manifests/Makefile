@@ -13,20 +13,22 @@
 # limitations under the License.
 
 IMAGE_NAME?=gcr.io/madhusudancs-k8s/federation-charts
-IMAGE_VERSION?=v1.3.0
+IMAGE_VERSION?=v0.0.1
+
+KUBE_VERSION?=v1.3.0
 
 .PHONY: build
 build:
 	docker build \
-	  --build-arg VERSION=$(IMAGE_VERSION) \
+	  --build-arg VERSION=$(KUBE_VERSION) \
 	  -t $(IMAGE_NAME):$(IMAGE_VERSION) .
 
 .PHONY: push
 push:
 	gcloud docker push $(IMAGE_NAME):$(IMAGE_VERSION)
 
-.PHONY: run
-run:
+.PHONY: runbash
+runbash:
 	docker run \
 	  -it \
 	  -m 12G \
