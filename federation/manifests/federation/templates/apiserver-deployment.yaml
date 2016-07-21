@@ -47,7 +47,7 @@ spec:
     spec:
       containers:
       - name: apiserver
-        image: {{.Values.apiserverImage}}:{{.Values.apiserverVersion}}
+        image: {{.Values.apiserverRegistry}}/hyperkube-amd64:{{.Values.apiserverVersion}}
         command:
         - /hyperkube
         - federation-apiserver

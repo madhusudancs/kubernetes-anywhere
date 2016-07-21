@@ -23,7 +23,7 @@ spec:
         - name: ssl-certs
           readOnly: true
           mountPath: /etc/ssl/certs
-        image: {{.Values.controllerManagerImage}}:{{.Values.controllerManagerVersion}}
+        image: {{.Values.controllerManagerRegistry}}/hyperkube-amd64:{{.Values.controllerManagerVersion}}
         command:
         - /hyperkube
         - federation-controller-manager

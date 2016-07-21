@@ -7,14 +7,14 @@ namespace:
   name: "federation"
 
 apiserverName: "federation-apiserver"
-apiserverImage: "gcr.io/google-containers/hyperkube-amd64"
+apiserverRegistry: "gcr.io/google-containers"
 apiserverVersion: "v1.3.0"
 apiserverServiceCIDR: "10.0.0.0/16"
 apiserverFetchSvcAddressImage: "gcr.io/madhusudancs-k8s/fetch-svc-endpoint"
 apiserverFetchSvcAddressVersion: "v1.3.0"
 
 controllerManagerName: "federation-controller-manager"
-controllerManagerImage: "gcr.io/google-containers/hyperkube-amd64"
+controllerManagerRegistry: "gcr.io/google-containers"
 controllerManagerVersion: "v1.3.0"
 controllerManagerDNSProvider: "google-clouddns"
 controllerManagerFederationName: "federation"
