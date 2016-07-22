@@ -18,18 +18,12 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly FEDERATION_API_TOKEN="$(dd 'if=/dev/urandom' bs=128 count=1 2>/dev/null | base64 | tr -d '=+/' | dd bs=32 count=1 2>/dev/null)"
-readonly FEDERATION_API_KNOWN_TOKENS="${FEDERATION_API_TOKEN},admin,admin"
-
 readonly OUTPUT_DIR="/_output"
-readonly VALUES_FILE="${OUTPUT_DIR}/values.yaml"
+VALUES_FILE="${OUTPUT_DIR}/values.yaml"
 
-mkdir -p "${OUTPUT_DIR}"
-
-cat <<EOF>> "${VALUES_FILE}"
-apiserverToken: "${FEDERATION_API_TOKEN}"
-apiserverKnownTokens: "${FEDERATION_API_KNOWN_TOKENS}"
-EOF
+if [[ ! -f "${VALUES_FILE}" ]]; then
+	VALUES_FILE=""
+fi
 
 TILLER_LOG="/var/log/tiller.log"
 tiller > "${TILLER_LOG}" 2>&1 &

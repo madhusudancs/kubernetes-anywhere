@@ -18,21 +18,15 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly ACTION="${1:-}"
+readonly FEDERATION_API_TOKEN="$(dd 'if=/dev/urandom' bs=128 count=1 2>/dev/null | base64 | tr -d '=+/' | dd bs=32 count=1 2>/dev/null)"
+readonly FEDERATION_API_KNOWN_TOKENS="${FEDERATION_API_TOKEN},admin,admin"
 
-case "${1:-}" in
-	"")
-	echo "Action must be either \"deploy\" or \"destroy\", got: ${ACTION}"
-	exit 1
-	;;
-	"deploy")
-	./gen.sh
-	./install.sh
-	;;
-	"destroy")
-	./uninstall.sh
-	;;
-	"gen")
-	./gen.sh
-	;;
-esac
+readonly OUTPUT_DIR="/_output"
+readonly VALUES_FILE="${OUTPUT_DIR}/values.yaml"
+
+mkdir -p "${OUTPUT_DIR}"
+
+cat <<EOF>> "${VALUES_FILE}"
+apiserverToken: "${FEDERATION_API_TOKEN}"
+apiserverKnownTokens: "${FEDERATION_API_KNOWN_TOKENS}"
+EOF

@@ -51,6 +51,7 @@ RUN cd ${HELMSRC} && cp bin/helm ${GOBIN}
 RUN cd ${HELMSRC} && cp bin/tiller ${GOBIN}
 RUN helm init -c
 
+ADD gen.sh /
 ADD install.sh /
 ADD uninstall.sh /
 ADD entrypoint.sh /
