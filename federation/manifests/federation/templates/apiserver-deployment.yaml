@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{.Values.apiserverName}}
-  namespace: {{.Values.namespace.name}}
+  namespace: {{.Values.namespace}}
   labels:
     app: federated-cluster
 spec:
@@ -23,7 +23,7 @@ spec:
                 "env": [
                   {
                     "name": "API_SERVER_SVC_NAMESPACE",
-                    "value": "{{.Values.namespace.name}}"
+                    "value": "{{.Values.namespace}}"
                   },
                   {
                     "name": "API_SERVER_SVC_NAME",

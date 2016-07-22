@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{.Values.controllerManagerName}}
-  namespace: {{.Values.namespace.name}}
+  namespace: {{.Values.namespace}}
   labels:
     app: federated-cluster
 spec:
