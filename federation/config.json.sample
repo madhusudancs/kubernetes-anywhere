@@ -79,5 +79,5 @@
       "heapster": true,
       "kube_dns": true
     }
-  },
+  }
 ]

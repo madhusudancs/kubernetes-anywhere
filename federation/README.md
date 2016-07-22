@@ -2,7 +2,7 @@
 
 All patches and feedback welcome.
 
-# TODO
+# List of ideas for improvement.
 
 1. Don't build and distribute a giant docker image with all the build
    artifacts.
@@ -22,3 +22,6 @@ All patches and feedback welcome.
 7. Once `fetch-svc-endpoint` code is moved out of the manifests directory,
    add everything in the manifests directory to the docker image in the
    Dockerfile instead of individually listing the files and directories.
+8. We arbitrarily make the first cluster in config.json the federation
+   bootstrap cluster. Make this a config.json variable and read the value
+   from there.
