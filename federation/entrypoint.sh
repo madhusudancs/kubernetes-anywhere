@@ -23,7 +23,7 @@ cd "${BASH_SOURCE%/*}"
 
 readonly OUTPUT_DIR="/_output"
 
-readonly CLUSTER_NAMES=("$(jq -r '.[].phase1.cluster_name' ${OUTPUT_DIR}/config.json)")
+readonly CLUSTER_NAMES=($(jq -r '.[].phase1.cluster_name' "${OUTPUT_DIR}/config.json"))
 
 gen() {
   mkdir -p "${OUTPUT_DIR}"
@@ -39,9 +39,12 @@ deploy() {
   gen
   terraform apply -state="${OUTPUT_DIR}/terraform.tfstate" "${OUTPUT_DIR}"
 
-  for cname in ${CLUSTER_NAMES}; do
+  for cname in ${CLUSTER_NAMES[@]}; do
     kubectl create -f "${OUTPUT_DIR}/manifests/${cname}" --context="${cname}"
   done
+
+  # Arbitrarily select the first cluster as the bootstrap cluster.
+  kubectl config use-context "${CLUSTER_NAMES[0]}"
 }
 
 destroy() {
