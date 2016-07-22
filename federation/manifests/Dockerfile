@@ -51,9 +51,12 @@ RUN cd ${HELMSRC} && cp bin/helm ${GOBIN}
 RUN cd ${HELMSRC} && cp bin/tiller ${GOBIN}
 RUN helm init -c
 
-ADD helminstall.sh /
+ADD install.sh /
+ADD uninstall.sh /
+ADD entrypoint.sh /
+
 
 ADD /namespace /namespace
 ADD /federation /federation
 
-ENTRYPOINT ["/helminstall.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
