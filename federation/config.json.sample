@@ -8,7 +8,7 @@
       "gce": {
         "os_image": "ubuntu-1604-xenial-v20160420c",
         "instance_type": "n1-standard-2",
-        "project": "madhusudancs-k8s",
+        "project": "my-project-name",
         "region": "us-central1",
         "zone": "us-central1-a",
         "network": "anywhereworks"
@@ -35,7 +35,7 @@
       "gce": {
         "os_image": "ubuntu-1604-xenial-v20160420c",
         "instance_type": "n1-standard-2",
-        "project": "madhusudancs-k8s",
+        "project": "my-project-name",
         "region": "us-central1",
         "zone": "us-central1-b",
         "network": "anywhereworks"
@@ -62,7 +62,7 @@
       "gce": {
         "os_image": "ubuntu-1604-xenial-v20160420c",
         "instance_type": "n1-standard-2",
-        "project": "madhusudancs-k8s",
+        "project": "my-project-name",
         "region": "us-central1",
         "zone": "us-central1-f",
         "network": "anywhereworks"
