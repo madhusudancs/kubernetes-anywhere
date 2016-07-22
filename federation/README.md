@@ -18,3 +18,7 @@ All patches and feedback welcome.
    Also, add tests for it.
 5. Convert the `fetch-svc-endpoint` polling logic to API server `watch`
    logic. It is much easier to reason about that way.
+6. Move the `fetch-svc-endpoint` code out of the manifests directory.
+7. Once `fetch-svc-endpoint` code is moved out of the manifests directory,
+   add everything in the manifests directory to the docker image in the
+   Dockerfile instead of individually listing the files and directories.

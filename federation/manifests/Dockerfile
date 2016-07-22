@@ -54,8 +54,6 @@ RUN helm init -c
 ADD install.sh /
 ADD uninstall.sh /
 ADD entrypoint.sh /
-
-
 ADD /namespace /namespace
 ADD /federation /federation
 
