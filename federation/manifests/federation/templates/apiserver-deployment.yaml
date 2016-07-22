@@ -14,12 +14,10 @@ spec:
         module: federation-apiserver
       annotations:
         pod.alpha.kubernetes.io/initialized: "true"
-        # TODO: imagePullPolicy = Always is only for debugging. It should be defaulted (to Never) when shipped.
         pod.alpha.kubernetes.io/init-containers: '[
             {
-                "imagePullPolicy": "Always",
                 "name": "init",
-                "image": "{{.Values.apiserverFetchSvcAddressImage}}:{{.Values.apiserverFetchSvcAddressVersion}}",
+                "image": "{{.Values.apiserverFetchSvcAddressRegistry}}/fetch-svc-endpoint:{{.Values.apiserverFetchSvcAddressVersion}}",
                 "env": [
                   {
                     "name": "API_SERVER_SVC_NAMESPACE",

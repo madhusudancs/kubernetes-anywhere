@@ -9,7 +9,7 @@ apiserverName: "federation-apiserver"
 apiserverRegistry: "gcr.io/google-containers"
 apiserverVersion: "v1.3.0"
 apiserverServiceCIDR: "10.0.0.0/16"
-apiserverFetchSvcAddressImage: "gcr.io/madhusudancs-k8s/fetch-svc-endpoint"
+apiserverFetchSvcAddressRegistry: "gcr.io/madhusudancs-k8s"
 apiserverFetchSvcAddressVersion: "v1.3.0"
 
 controllerManagerName: "federation-controller-manager"
