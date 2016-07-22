@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_NAME?=gcr.io/madhusudancs-k8s/fetch-svc-endpoint
-IMAGE_VERSION?=v1.3.0
+IMAGE_NAME?=gcr.io/madhusudancs-containers/fetch-svc-endpoint
+IMAGE_VERSION?=v0.9.0
+
+KUBE_VERSION?=v1.3.0
 
 .PHONY: build
 build:
 	docker build \
-	  --build-arg VERSION=$(IMAGE_VERSION) \
+	  --build-arg VERSION=$(KUBE_VERSION) \
 	  -t $(IMAGE_NAME):$(IMAGE_VERSION) .
 
 .PHONY: push

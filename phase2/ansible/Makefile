@@ -1,5 +1,5 @@
 TAG=v2
-IMAGE=gcr.io/madhusudancs-k8s/install-k8s
+IMAGE=gcr.io/madhusudancs-containers/install-k8s
 
 build:
 	docker build -t "$(IMAGE):$(TAG)" .

@@ -49,11 +49,11 @@ curl -sSL https://get.docker.com/ | sh
 apt-get install bzip2
 systemctl start docker || true
 
-gcloud docker pull gcr.io/madhusudancs-k8s/install-k8s:v2
+gcloud docker pull gcr.io/madhusudancs-containers/install-k8s:v2
 
 docker run \
   --net=host \
   -v /:/host_root \
   -v /etc/kubernetes/k8s_config.json:/opt/playbooks/config.json:ro \
-  gcr.io/madhusudancs-k8s/install-k8s:v2 \
+  gcr.io/madhusudancs-containers/install-k8s:v2 \
   /opt/do_role.sh "${ROLE}"

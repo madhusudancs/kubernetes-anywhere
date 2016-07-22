@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-IMAGE_NAME?=gcr.io/madhusudancs-k8s/kubernetes-anywhere-federation
-IMAGE_VERSION?=v0.0.1
+IMAGE_NAME?=gcr.io/madhusudancs-containers/kubernetes-anywhere-federation
+IMAGE_VERSION?=v0.9.0
 
 KUBE_VERSION?=v1.3.0
 
