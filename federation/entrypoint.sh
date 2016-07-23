@@ -23,7 +23,12 @@ cd "${BASH_SOURCE%/*}"
 
 readonly OUTPUT_DIR="/_output"
 
+# Fetch the list of cluster names from config.json
 readonly CLUSTER_NAMES=($(jq -r '.[].phase1.cluster_name' "${OUTPUT_DIR}/config.json"))
+
+# Log and store terraform log.
+export TF_LOG=TRACE
+export TF_LOG_PATH="${OUTPUT_DIR}/terraform.log"
 
 gen() {
   mkdir -p "${OUTPUT_DIR}"
