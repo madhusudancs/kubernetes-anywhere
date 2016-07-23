@@ -69,8 +69,9 @@ RUN cd ${KUBEFORM_DIR} && cp terraform-provider-kubernetes /usr/local/bin/
 # change the permissions, I can't access anything within the subdirectories
 # in /kubernetes-anywhere when I run the container with --user
 # (non-privileged user). But I can when I extract the tarball.
-ADD kubernetes-anywhere.tar.gz /kubernetes-anywhere
-RUN chmod a+rwx /kubernetes-anywhere
+# Also see https://github.com/docker/docker/issues/7511
+ADD kubernetes-anywhere.tar.gz /tmp/kubernetes-anywhere
+RUN cp -r /tmp/kubernetes-anywhere /kubernetes-anywhere && chmod -R a+rwx /kubernetes-anywhere && rm -r /tmp/kubernetes-anywhere
 
 WORKDIR /kubernetes-anywhere/federation
 
