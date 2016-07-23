@@ -19,9 +19,12 @@ All patches and feedback welcome.
 5. Convert the `fetch-svc-endpoint` polling logic to API server `watch`
    logic. It is much easier to reason about that way.
 6. Move the `fetch-svc-endpoint` code out of the manifests directory.
-7. Once `fetch-svc-endpoint` code is moved out of the manifests directory,
-   add everything in the manifests directory to the docker image in the
-   Dockerfile instead of individually listing the files and directories.
+7. Once `fetch-svc-endpoint` code is moved out of the manifests
+   directory, add everything in the manifests directory to the docker
+   image in the Dockerfile instead of individually listing the files
+   and directories.
 8. We arbitrarily make the first cluster in config.json the federation
-   bootstrap cluster. Make this a config.json variable and read the value
-   from there.
+   bootstrap cluster. Make this a config.json variable and read the
+   value from there.
+9. Store the terraform state in GCS (This is pretty important from the
+   usability stand point)
