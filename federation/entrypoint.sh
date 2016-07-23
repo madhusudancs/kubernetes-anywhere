@@ -28,7 +28,7 @@ readonly CLUSTER_NAMES=($(jq -r '.[].phase1.cluster_name' "${OUTPUT_DIR}/config.
 gen() {
   mkdir -p "${OUTPUT_DIR}"
 
-  for cname in ${CLUSTER_NAMES}; do
+  for cname in ${CLUSTER_NAMES[@]}; do
     mkdir -p "${OUTPUT_DIR}/manifests/${cname}"
   done
 
