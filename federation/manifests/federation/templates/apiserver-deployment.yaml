@@ -15,32 +15,16 @@ spec:
       annotations:
         pod.alpha.kubernetes.io/initialized: "true"
         pod.alpha.kubernetes.io/init-containers: '[
-            {
-                "name": "init",
-                "image": "{{.Values.apiserverFetchSvcAddressRegistry}}/fetch-svc-endpoint:{{.Values.apiserverFetchSvcAddressVersion}}",
-                "env": [
-                  {
-                    "name": "API_SERVER_SVC_NAMESPACE",
-                    "value": "{{.Values.namespace}}"
-                  },
-                  {
-                    "name": "API_SERVER_SVC_NAME",
-                    "value": "{{.Values.apiserverName}}"
-                  },
-                  {
-                    "name": "API_SERVER_ENDPOING_CONFIGMAP_NAME",
-                    "value": "{{.Values.apiserverName}}-endpoint"
-                  },
-                  {
-                    "name": "API_SERVER_TOKENS_SECRET_NAME",
-                    "value": "{{.Values.apiserverName}}-tokens"
-                  },
-                  {
-                    "name": "API_SERVER_KUBECONFIG_SECRET_NAME",
-                    "value": "{{.Values.apiserverName}}-kubeconfig"
-                  }
-                ]
-            }
+          {
+            "name": "init",
+            "image": "{{.Values.apiserverInitRegistry}}/init:{{.Values.apiserverInitVersion}}",
+            "args": [
+              "--namespace={{.Values.namespace}}",
+              "--secret={{.Values.apiserverName}}-credentials",
+              "--controllermanager-kubeconfig-secret={{.Values.controllerManagerName}}-kubeconfig",
+              "--service={{.Values.apiserverName}}"
+            ]
+          }
         ]'
     spec:
       containers:
@@ -55,7 +39,11 @@ spec:
         - --secure-port=443
         - --advertise-address=$(API_SERVER_SVC_ENDPOINT)
         # TODO: --admission-control values must be set when support is added for each type of control.
-        - --token-auth-file=/srv/kubernetes/knowntokens.csv
+        - --token-auth-file=/etc/federation/apiserver/known_tokens.csv
+        - --basic-auth-file=/etc/federation/apiserver/basic_auth.csv
+        - --client-ca-file=/etc/federation/apiserver/ca.crt
+        - --tls-cert-file=/etc/federation/apiserver/server.crt
+        - --tls-private-key-file=/etc/federation/apiserver/server.key
         ports:
         - containerPort: 443
           name: https
@@ -68,8 +56,8 @@ spec:
               name: {{.Values.apiserverName}}-endpoint
               key: endpoint
         volumeMounts:
-        - name: {{.Values.apiserverName}}-tokens
-          mountPath: /srv/kubernetes/
+        - name: {{.Values.apiserverName}}-credentials
+          mountPath: /etc/federation/apiserver
           readOnly: true
       - name: etcd
         image: quay.io/coreos/etcd:v2.3.3
@@ -81,9 +69,9 @@ spec:
         - mountPath: /var/etcd
           name: varetcd
       volumes:
-      - name: {{.Values.apiserverName}}-tokens
+      - name: {{.Values.apiserverName}}-credentials
         secret:
-          secretName: {{.Values.apiserverName}}-tokens
+          secretName: {{.Values.apiserverName}}-credentials
       - name: varetcd
         persistentVolumeClaim:
           claimName: {{.Values.apiserverName}}-etcd-claim

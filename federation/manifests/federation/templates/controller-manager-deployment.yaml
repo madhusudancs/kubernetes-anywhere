@@ -14,20 +14,21 @@ spec:
         module: federation-controller-manager
     spec:
       volumes:
-      - name: ssl-certs
-        hostPath:
-          path: /etc/ssl/certs
+      - name: kubeconfig
+        secret:
+          secretName: {{.Values.controllerManagerName}}-kubeconfig
       containers:
       - name: controller-manager
         volumeMounts:
-        - name: ssl-certs
+        - name: kubeconfig
           readOnly: true
-          mountPath: /etc/ssl/certs
+          mountPath: "/etc/federation/controller-manager",
         image: {{.Values.controllerManagerRegistry}}/hyperkube-amd64:{{.Values.controllerManagerVersion}}
         command:
         - /hyperkube
         - federation-controller-manager
         - --master=https://{{.Values.apiserverName}}
+        - --kubeconfig=/etc/federation/controller-manager/kubeconfig
         - --dns-provider={{.Values.controllerManagerDNSProvider}}
         - --dns-provider-config={{.Values.controllerManagerDNSProviderConfig}}
         - --federation-name={{.Values.controllerManagerFederationName}}
