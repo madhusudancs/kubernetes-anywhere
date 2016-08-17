@@ -31,7 +31,10 @@ export TF_LOG=TRACE
 export TF_LOG_PATH="${OUTPUT_DIR}/terraform.log"
 
 gen() {
-  mkdir -p "${OUTPUT_DIR}"
+  if [[ ! -d "${OUTPUT_DIR}" ]]; then
+    echo "${OUTPUT_DIR} does not exist"
+    exit 1
+  fi
 
   for cname in ${CLUSTER_NAMES[@]}; do
     mkdir -p "${OUTPUT_DIR}/manifests/${cname}"
