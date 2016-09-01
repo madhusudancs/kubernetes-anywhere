@@ -26,7 +26,6 @@ case "${1:-}" in
 	exit 1
 	;;
 	"deploy")
-	./gen.sh
 	./install.sh
 	;;
 	"destroy")
@@ -34,5 +33,8 @@ case "${1:-}" in
 	;;
 	"gen")
 	./gen.sh
+	;;
+	"redeploy")
+	./redeploy.sh
 	;;
 esac
