@@ -27,6 +27,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		curl \
 	&& rm -rf /var/lib/apt/lists/*
 
+RUN curl https://bootstrap.pypa.io/get-pip.py  | python -
+RUN pip install ruamel.yaml
+
 ADD https://storage.googleapis.com/golang/go1.6.2.linux-amd64.tar.gz ./
 RUN tar xzf go1.6.2.linux-amd64.tar.gz
 
@@ -55,6 +58,8 @@ ADD gen.sh /
 ADD install.sh /
 ADD uninstall.sh /
 ADD entrypoint.sh /
+ADD update_values.py /
+ADD fetch-svc-endpoint/fetch-svc-endpoint.sh /
 ADD /namespace /namespace
 ADD /federation /federation
 

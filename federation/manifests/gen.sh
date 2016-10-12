@@ -25,8 +25,7 @@ readonly OUTPUT_DIR="/_output"
 readonly VALUES_FILE="${OUTPUT_DIR}/values.yaml"
 
 mkdir -p "${OUTPUT_DIR}"
+touch "${VALUES_FILE}"
 
-cat <<EOF>> "${VALUES_FILE}"
-apiserverToken: "${FEDERATION_API_TOKEN}"
-apiserverKnownTokens: "${FEDERATION_API_KNOWN_TOKENS}"
-EOF
+/update_values.py --token="${FEDERATION_API_TOKEN}" "${VALUES_FILE}"
+printf "${FEDERATION_API_TOKEN}" > /apiserver.token

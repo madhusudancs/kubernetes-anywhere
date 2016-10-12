@@ -22,7 +22,7 @@ spec:
         volumeMounts:
         - name: kubeconfig
           readOnly: true
-          mountPath: "/etc/federation/controller-manager",
+          mountPath: "/etc/federation/controller-manager"
         image: {{.Values.controllerManagerRegistry}}/hyperkube-amd64:{{.Values.controllerManagerVersion}}
         command:
         - /hyperkube

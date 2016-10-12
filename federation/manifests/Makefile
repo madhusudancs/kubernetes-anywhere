@@ -13,9 +13,9 @@
 # limitations under the License.
 
 IMAGE_NAME?=gcr.io/madhusudancs-containers/federation-charts
-IMAGE_VERSION?=v0.9.0
+IMAGE_VERSION?=v0.9.1
 
-KUBE_VERSION?=v1.3.0
+KUBE_VERSION?=v1.4.2
 
 .PHONY: build
 build:
